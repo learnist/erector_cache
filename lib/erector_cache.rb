@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'action_controller'
 require 'erector'
 require 'erector/rails'
 require 'erector_cache/fragment'

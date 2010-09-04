@@ -2,23 +2,19 @@ module ErectorCache
   module Widget
     def self.included(base)
       base.extend ClassMethods
-      base.send :include, Singletons
+      include InstanceMethods
     end
 
     module ClassMethods
-      @key_components = []
-      def key_components
-        @key_components
-      end
-      
-      def cache_with(*key_components)
-        @key_components = key_components
+      def cache_with(*components)
+        class_inheritable_array :key_components
+        self.key_components = components
       end
     end
-    
-    module Singletons
+
+    module InstanceMethods
       def cache_key
-        puts "WOOOOOO"
+        
       end
     end
   end
