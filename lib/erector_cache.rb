@@ -1,0 +1,5 @@
+require 'rubygems'
+require 'erector'
+require 'erector/rails'
+require 'erector_cache/fragment'
+require 'erector_cache/widget'

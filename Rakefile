@@ -12,6 +12,7 @@ begin
     gem.authors = ["Grockit"]
     gem.add_development_dependency "rspec", ">= 1.2.6"
     gem.add_dependency "lawnchair", ">=0.6.7"
+    gem.add_dependency "erector", "=0.8.1"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
