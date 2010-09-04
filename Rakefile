@@ -10,8 +10,8 @@ begin
     gem.email = "mmol@grockit.com"
     gem.homepage = "http://github.com/grockit/erector_cache"
     gem.authors = ["Grockit"]
-    gem.add_development_dependency "rspec", ">= 1.2.9"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    gem.add_development_dependency "rspec", ">= 1.2.6"
+    gem.add_dependency "lawnchair", ">=0.6.7"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
