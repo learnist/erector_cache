@@ -26,7 +26,6 @@ module ErectorCache
           k_prime = part.is_a?(Hash) ? part.keys.first : part
           collection << k_prime
           collection << hash[k_prime]
-          collection
         end.join(":")
         
         LAWNCHAIR.redis.keys(search_key).split.each{|key| LAWNCHAIR.redis.del(key) }
@@ -36,23 +35,20 @@ module ErectorCache
         self.key_components.inject([self.to_s]) do |collection, part|
           object = part.is_a?(Hash) ? hash[part.keys.first] : hash[part]
 
-          if object.respond_to?(:to_param)
-            if part.is_a?(Hash)
-              key = part.keys.first
-              value = Array(part[key]).map do |p| 
-                if p.is_a?(Proc)
-                  p.call(object)
-                else
-                  object.send(p)
-                end
-              end.join("-")
-            else
-              key = part
-              value = object.to_param
-            end
-            collection << [key, value]
+          if part.is_a?(Hash)
+            key = part.keys.first
+            value = Array(part[key]).map do |p| 
+              if p.is_a?(Proc)
+                p.call(object)
+              else
+                object.send(p)
+              end
+            end.join("-")
+          else
+            key = part
+            value = object.to_param
           end
-          collection
+          collection << [key, value]
         end.flatten.join(":")
       end
       
