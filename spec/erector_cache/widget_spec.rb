@@ -93,7 +93,35 @@ describe ErectorCache::Widget do
       end
       
       context "when there is NO cache_with set" do
-        it "calls _render_via_without_caching"
+        
+        class People < Erector::Widget
+          def content
+            widget Sheriff, :name => "Boss Hogg", :attitude => "Bad", :boys => ["good", "ol'"], :belly => :round
+          end
+        end
+        
+        class Sheriff < Erector::Widget
+          def content
+            div do
+              div "Last failed to catch #{@boys.join('-')} boys: #{Time.now.to_s(:db)}"
+              div "Name: #{@name}"
+            end
+          end
+        end
+        
+        it "calls _render_via_without_caching" do
+          render_template do |controller|
+            controller.render_widget People
+          end
+          @output.should include("Name: Boss Hogg")
+          expected_cached_at_time = @output.match(/boys: (.*)</)[1]
+          sleep 1
+          
+          render_template do |controller|
+            controller.render_widget People
+          end
+          @output.should_not include(expected_cached_at_time)
+        end
       end
     end
     

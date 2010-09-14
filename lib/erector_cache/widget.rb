@@ -2,7 +2,9 @@ module ErectorCache
   module Widget
     def self.included(base)
       base.module_eval do
+        cattr_accessor :expire_in
         extend ClassMethods
+        class_inheritable_array :key_components
         include InstanceMethods
         alias_method_chain :_render_via, :caching
       end
@@ -10,9 +12,7 @@ module ErectorCache
 
     module ClassMethods
       def cache_with(*components)
-        class_inheritable_array :key_components
         self.key_components = components
-        cattr_accessor :expire_in
       end
       
       def cache_for(ttl)
