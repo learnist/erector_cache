@@ -1,14 +1,22 @@
 module ErectorCache
   module Widget
     def self.included(base)
-      base.extend ClassMethods
+      base.module_eval do
+        extend ClassMethods
+        include InstanceMethods
+        alias_method_chain :_render_via, :caching
+      end
     end
 
     module ClassMethods
       def cache_with(*components)
         class_inheritable_array :key_components
-        include InstanceMethods
         self.key_components = components
+        cattr_accessor :expire_in
+      end
+      
+      def cache_for(ttl)
+        self.expire_in = ttl
       end
       
       def cache_key(hash)
@@ -46,6 +54,18 @@ module ErectorCache
           key_data[part] = self.instance_variable_get("@#{part}")
         end
         return self.class.cache_key(key_data)
+      end
+      
+      def _render_via_with_caching(parent, options={})
+        if self.class.key_components.blank?
+          _render_via_without_caching(parent, options)
+        else
+          options = {:expire_in => @expire_in || 1.hour}
+          cached_fragment = Lawnchair.cache(cache_key, options) do
+            parent.capture { _render_via_without_caching(parent, options) }
+          end
+          parent.output << cached_fragment
+        end
       end
     end
   end
