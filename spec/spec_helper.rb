@@ -3,15 +3,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'erector_cache'
 require 'spec'
 require 'spec/autorun'
+require "lawnchair"
+LAWNCHAIR = Lawnchair
+LAWNCHAIR.connectdb(Redis.new(:db => 3))
 
 Spec::Runner.configure do |config|
-  config.before(:all) do
-    require "lawnchair"
-    Lawnchair.connectdb(Redis.new(:db => 3))
-  end
-  
   config.before(:each) do
-    Lawnchair.flushdb
+    LAWNCHAIR.flushdb
   end
 end
 

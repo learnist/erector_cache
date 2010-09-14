@@ -50,6 +50,31 @@ describe ErectorCache::Widget do
       end
     end
     
+    describe ".expire!" do
+      it "expires the cache" do
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Leonardo", :weapon => "Katanas", :master => @splinter
+        end
+        expected_cached_at_time = @output.match(/Cached at: (.*)</)[1]
+
+        sleep 1
+         
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Leonardo", :weapon => "Katanas", :master => @splinter, :slogan => "Turtle Power!"
+        end
+        @output.should include expected_cached_at_time
+        
+        NinjaTurtle.expire!(:weapon => "Katanas")
+
+        sleep 1
+        
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Leonardo", :weapon => "Katanas", :master => @splinter
+        end
+        @output.should_not include expected_cached_at_time
+      end
+    end
+    
     describe ".cache_for" do
       it "sets appropriate ttl" do
         Turtle.expire_in.should == 25.years
@@ -72,7 +97,7 @@ describe ErectorCache::Widget do
     
     describe "_render_via_with_caching" do
       context "when there is a cache_with set" do
-        it "stores the widgets output in Lawnchair" do
+        it "stores the widgets output in LAWNCHAIR" do
           now = Time.now
 
           render_template do |controller|
@@ -93,7 +118,6 @@ describe ErectorCache::Widget do
       end
       
       context "when there is NO cache_with set" do
-        
         class People < Erector::Widget
           def content
             widget Sheriff, :name => "Boss Hogg", :attitude => "Bad", :boys => ["good", "ol'"], :belly => :round

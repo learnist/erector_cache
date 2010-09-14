@@ -19,6 +19,19 @@ module ErectorCache
         self.expire_in = ttl
       end
       
+      def expire!(hash={})
+        hash = Hash.new("*").merge(hash)
+        
+        search_key = self.key_components.inject(["Lawnchair", self.to_s]) do |collection, part|
+          k_prime = part.is_a?(Hash) ? part.keys.first : part
+          collection << k_prime
+          collection << hash[k_prime]
+          collection
+        end.join(":")
+        
+        LAWNCHAIR.redis.keys(search_key).split.each{|key| LAWNCHAIR.redis.del(key) }
+      end
+      
       def cache_key(hash)
         self.key_components.inject([self.to_s]) do |collection, part|
           object = part.is_a?(Hash) ? hash[part.keys.first] : hash[part]
@@ -38,12 +51,11 @@ module ErectorCache
               value = object.to_param
             end
             collection << [key, value]
-          else
-            collection << [part, object]
           end
           collection
         end.flatten.join(":")
       end
+      
     end
 
     module InstanceMethods
@@ -61,7 +73,7 @@ module ErectorCache
           _render_via_without_caching(parent, options)
         else
           options = {:expire_in => @expire_in || 1.hour}
-          cached_fragment = Lawnchair.cache(cache_key, options) do
+          cached_fragment = LAWNCHAIR.cache(cache_key, options) do
             parent.capture { _render_via_without_caching(parent, options) }
           end
           parent.output << cached_fragment
