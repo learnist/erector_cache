@@ -73,6 +73,24 @@ describe ErectorCache::Widget do
         end
         @output.should_not include expected_cached_at_time
       end
+      
+      it "allows you to pass in an object as a key value to expire" do
+        @he_man = Master.new("He-man")
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Leonardo", :weapon => "Katanas", :master => @splinter
+        end
+        
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Myrtle", :weapon => "Shell", :master => @he_man
+        end
+        
+        Lawnchair.redis.keys("*Splinter*").should_not be_blank
+        Lawnchair.redis.keys("*He-man*").should_not be_blank
+        NinjaTurtle.expire!(:master => @splinter)
+        
+        Lawnchair.redis.keys("*Splinter*").should be_blank
+        Lawnchair.redis.keys("*He-man*").should_not be_blank
+      end
     end
     
     describe ".cache_for" do

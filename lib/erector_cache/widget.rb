@@ -21,11 +21,14 @@ module ErectorCache
       
       def expire!(hash={})
         hash = Hash.new("*").merge(hash)
-        
         search_key = self.key_components.inject(["Lawnchair", self.to_s]) do |collection, part|
-          k_prime = part.is_a?(Hash) ? part.keys.first : part
-          collection << k_prime
-          collection << hash[k_prime]
+          p_prime = (part.is_a?(Hash) ? part.keys.first : part)
+          collection << p_prime
+          collection << if part.is_a?(Hash) && hash.keys.include?(p_prime)
+            part[p_prime].call(hash[p_prime])
+          else
+            hash[p_prime.to_param]
+          end
         end.join(":")
         
         LAWNCHAIR.redis.keys(search_key).split.each{|key| LAWNCHAIR.redis.del(key) }
