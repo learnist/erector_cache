@@ -19,7 +19,21 @@ class Master
   end
   
   def to_param
-    name
+    @name
+  end
+end
+
+class Weapon
+  def initialize(name)
+    @name = name
+  end
+  
+  def name
+    @name
+  end
+  
+  def to_param
+    @name
   end
 end
 
@@ -74,7 +88,7 @@ describe ErectorCache::Widget do
         @output.should_not include expected_cached_at_time
       end
       
-      it "allows you to pass in an object as a key value to expire" do
+      it "expires based on cache key component that is a proc" do
         @he_man = Master.new("He-man")
         render_template do |controller|
           controller.render_widget Turtle, :name => "Leonardo", :weapon => "Katanas", :master => @splinter
@@ -90,6 +104,26 @@ describe ErectorCache::Widget do
         
         Lawnchair.redis.keys("*Splinter*").should be_blank
         Lawnchair.redis.keys("*He-man*").should_not be_blank
+      end
+      
+      it "expires based on regular object with to_param" do
+        @he_man = Master.new("He-man")
+        @shell = Weapon.new("Shell")
+        
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Leonardo", :weapon => Weapon.new("Katanas"), :master => @splinter
+        end
+        
+        render_template do |controller|
+          controller.render_widget Turtle, :name => "Myrtle", :weapon => @shell, :master => @he_man
+        end
+        
+        Lawnchair.redis.keys("*Shell*").should_not be_blank
+        Lawnchair.redis.keys("*Katanas*").should_not be_blank
+        NinjaTurtle.expire!(:weapon => @shell)
+        
+        Lawnchair.redis.keys("*Shell*").should be_blank
+        Lawnchair.redis.keys("*Katanas*").should_not be_blank
       end
     end
     

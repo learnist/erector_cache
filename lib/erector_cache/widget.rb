@@ -27,7 +27,7 @@ module ErectorCache
           collection << if part.is_a?(Hash) && hash.keys.include?(p_prime)
             part[p_prime].call(hash[p_prime])
           else
-            hash[p_prime.to_param]
+            hash[p_prime].to_param
           end
         end.join(":")
         
