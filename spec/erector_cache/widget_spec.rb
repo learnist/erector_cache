@@ -120,6 +120,7 @@ describe ErectorCache::Widget do
         
         Lawnchair.redis.keys("*Shell*").should_not be_blank
         Lawnchair.redis.keys("*Katanas*").should_not be_blank
+
         NinjaTurtle.expire!(:weapon => @shell)
         
         Lawnchair.redis.keys("*Shell*").should be_blank

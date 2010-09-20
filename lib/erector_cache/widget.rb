@@ -31,7 +31,7 @@ module ErectorCache
           end
         end.join(":")
         
-        LAWNCHAIR.redis.keys(search_key).split.each{|key| LAWNCHAIR.redis.del(key) }
+        LAWNCHAIR.redis.keys(search_key).each{|key| LAWNCHAIR.redis.del(key) }
       end
       
       def cache_key(hash)
