@@ -85,15 +85,27 @@ Using this, we could set the cache to auto expire every time the associated obje
 
 Widget expiration is possible by calling the widget class's expire! method and passing in as much information about the keys to expire as you want.
 
-Given the keys <em>"Lawnchair:Bluth:name:Tobias:mistake:I_just_blue_myself", "Lawnchair:Bluth:name:Tobias:mistake:analyst_and_therapist"</em>
+Assume the following have occurred:
+
+  widget Bluth, :name => "Tobias", :mistake => "I_just_blue_myself"
+  widget Bluth, :name => "Tobias", :mistake => "analyst_and_therapist"
+  widget Bluth, :name => "Buster", :mistake => "swimming_with_seal"
 
 You can expire all Bluth widgets regardless of what the values of the params passed into them with:
   
   Bluth.expire!
   
-You can expire only the Bluth widget with :mistake => "I_just_blue_myself" by using:
+You can expire only the Bluth widget with <em>:mistake => "I_just_blue_myself"</em> by using:
 
   Bluth.expire!(:mistake => "I_just_blue_myself")
+  
+You can expire only the widgets with <em>:name => "Tobias"</em> with:
+
+  Bluth.expire!(:name => "Tobias")
+  
+Likewise, calling the following will expire only the one cached version of the widget that exists, leaving the other instance in the cache:
+
+  Bluth.expire!(:name => "Tobias", :mistake => "I_just_blue_myself")
   
 Any cache key component that is not passed into the expire! method will result in a wildcard match on that component, allowing you to be as specific as you wish.
 
