@@ -87,11 +87,11 @@ Widget expiration is possible by calling the widget class's expire! method and p
 
 Given the keys "Lawnchair:Bluth:name:Tobias:mistake:I_just_blue_myself", "Lawnchair:Bluth:name:Tobias:mistake:analyst_and_therapist"
 
-You can expire all keys for the Bluth class by using
+You can expire all Bluth widgets regardless of what the values of the params passed into them with:
   
   Bluth.expire!
   
-You can expire only the Tobias "I_just_blue_myself" key by using
+You can expire only the Bluth widget with :mistake => "I_just_blue_myself" by using:
 
   Bluth.expire!(:mistake => "I_just_blue_myself")
   
