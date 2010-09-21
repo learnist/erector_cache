@@ -99,7 +99,7 @@ You can expire only the Bluth widget with <em>:mistake => "I_just_blue_myself"</
 
   Bluth.expire!(:mistake => "I_just_blue_myself")
   
-You can expire only the widgets with <em>:name => "Tobias"</em> with:
+You can expire all widgets with <em>:name => "Tobias"</em> with:
 
   Bluth.expire!(:name => "Tobias")
   
