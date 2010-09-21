@@ -2,8 +2,8 @@
 
 Widget caching for Erector.
 
-Note:
-This only works at the widget level as this is essentially a fragment caching utility, and will not work for widgets rendered directly from a controller. (widget vs render_widget)
+<em>Note:
+This only works at the widget level as this is essentially a fragment caching utility, and will not work for widgets rendered directly from a controller. (widget vs render_widget)</em>
 
 == Installation
   sudo gem install erector_cache
@@ -97,8 +97,8 @@ You can expire only the Tobias "I_just_blue_myself" key by using
   
 Any cache key component that is not passed into the expire! method will result in a wildcard match on that component, allowing you to be as specific as you wish.
 
-Note:
-Lawnchair will automatically condense spaces, so don't feel constrained to using underscores or dashes in keys.
+<em>Note:
+Lawnchair will automatically condense spaces, so don't feel constrained to using underscores or dashes in keys.</em>
 
 
                          ....:~~~~~~~~~~~~~:~~::::::,..                         
