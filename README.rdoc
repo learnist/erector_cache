@@ -57,14 +57,14 @@ In the simple case the cache key will be built off of the value of the parameter
 
   widget Bluth, :name => "George Michael", :mistake => "consubrinaphilia"
 
-This will yield a cache key of "Lawnchair:Bluth:name:GeorgeMichael:mistake:consubrinaphilia"
+This will yield a cache key of <em>"Lawnchair:Bluth:name:GeorgeMichael:mistake:consubrinaphilia"</em>
 ---
 You can also pass whole objects into the widget and build the cache based on this.  It will default to using the to_param of the object as the key component value.
 
   @mistake = Mistake.create(:huge)
   widget Bluth, :name => "Gob", :mistake => @mistake
   
-This will yield a cache key of "Lawnchair:Bluth:name:Gob:mistake:I_just_made_a_huge_mistake"
+This will yield a cache key of <em>"Lawnchair:Bluth:name:Gob:mistake:I_just_made_a_huge_mistake"</em>
 ---
 This is essentially the same as doing this, which opens up more complex possibilities for generating cache keys
   
@@ -85,7 +85,7 @@ Using this, we could set the cache to auto expire every time the associated obje
 
 Widget expiration is possible by calling the widget class's expire! method and passing in as much information about the keys to expire as you want.
 
-Given the keys "Lawnchair:Bluth:name:Tobias:mistake:I_just_blue_myself", "Lawnchair:Bluth:name:Tobias:mistake:analyst_and_therapist"
+Given the keys <em>"Lawnchair:Bluth:name:Tobias:mistake:I_just_blue_myself", "Lawnchair:Bluth:name:Tobias:mistake:analyst_and_therapist"</em>
 
 You can expire all Bluth widgets regardless of what the values of the params passed into them with:
   
