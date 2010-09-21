@@ -1,8 +1,10 @@
 = Erector Cache
 
 Widget caching for Erector.
-_Note:_::
-_This only works at the widget level as this is essentially a fragment caching utility, and will not work for widgets rendered directly from a controller. (widget vs render_widget)_::
+
+_Note:_
+
+_This only works at the widget level as this is essentially a fragment caching utility, and will not work for widgets rendered directly from a controller. (widget vs render_widget)_
 
 == Installation
   sudo gem install erector_cache
@@ -95,8 +97,10 @@ You can expire only the Tobias "I_just_blue_myself" key by using
   Bluth.expire!(:mistake => "I_just_blue_myself")
   
 Any cache key component that is not passed into the expire! method will result in a wildcard match on that component, allowing you to be as specific as you wish.
-_Note:_::
-_Lawnchair will automatically condense spaces, so don't feel constrained to using underscores or dashes in keys._::
+
+_Note:_
+
+_Lawnchair will automatically condense spaces, so don't feel constrained to using underscores or dashes in keys._
 
 
                          ....:~~~~~~~~~~~~~:~~::::::,..                         
