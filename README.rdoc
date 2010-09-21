@@ -1,4 +1,104 @@
-erector_cache
+= Erector Cache
+
+ Widget caching for Erector.
+* Note: 
+This only works at the widget level as this is essentially a fragment caching utility, and will not work for widgets rendered directly from a controller. (widget vs render_widget)
+
+== Installation
+  sudo gem install erector_cache
+
+Checkout redis http://github.com/antirez/redis and install
+
+MAKE SURE REDIS SERVER IS RUNNING
+
+First, connect to the Redis database.  This would most likely go into an environment.rb.
+
+  Lawnchair.connectdb
+
+This will connect to a default database on localhost, if you want to connect to a particular database you can do:
+
+  Lawnchair.connectdb(Redis.new(:database => 11, :host => "127.0.0.1", :port => 6379))
+
+== Usage
+
+  class Bluth < Erector::Widget
+    cache_with :name, :mistake
+    cache_for 3.seasons
+    
+    def content
+      div "My name is #{@name} and #{@mistake.to_param}"
+    end
+  end
+  
+  class Mistake < ORM::Base
+    attr_reader :updated_at
+    
+    def initialize(size)
+      @size = size || :huge
+      @updated_at = Time.now
+    end
+    
+    def size
+      @size
+    end
+    
+    def to_param
+      "I_just_made_a_#{size}_mistake"
+    end
+  end
+
+* cache_for - Use this to tell the widget how long it should be cached for.  Defaults to 1 hour
+* cache_with - These are the widget parameters you want to use to build the cache key
+* expire! - Expire the instances of a widget matching the given parameters
+  
+=== cache_with
+
+In the simple case the cache key will be built off of the value of the parameter eg.
+
+  widget Bluth, :name => "George Michael", :mistake => "consubrinaphilia"
+
+This will yield a cache key of "Lawnchair:Bluth:name:GeorgeMichael:mistake:consubrinaphilia"
+
+You can also pass whole objects into the widget and build the cache based on this.  It will default to using the to_param of the object as the key component value.
+
+  @mistake = Mistake.create(:huge)
+  widget Bluth, :name => "Gob", :mistake => @mistake
+  
+This will yield a cache key of "Lawnchair:Bluth:name:Gob:mistake:I_just_made_a_huge_mistake"
+
+This is essentially the same as doing this, which opens up more complex possibilities for generating cache keys
+  
+  class Bluth < Erector::Widget
+    cache_with :name, :mistake => lambda {|mistake| mistake.to_param }
+  end
+  
+  @mistake = Mistake.create(:huge)
+  widget Bluth, :name => "Gob", :mistake => @mistake
+
+Using this, we could set the cache to auto expire every time the associated object is updated.
+
+  class Bluth < Erector::Widget
+    cache_with :name, :mistake => lambda {|mistake| mistake.updated_at }
+  end
+
+== Expiration
+
+Widget expiration is possible by calling the widget class's expire! method and passing in as much information about the keys to expire as you want.
+
+Given the keys "Lawnchair:Bluth:name:Tobias:mistake:I_just_blue_myself", "Lawnchair:Bluth:name:Tobias:mistake:analyst_and_therapist"
+
+You can expire all keys for the Bluth class by using
+  
+  Bluth.expire!
+  
+You can expire only the Tobias "I_just_blue_myself" key by using
+
+  Bluth.expire!(:mistake => "I_just_blue_myself")
+  
+Any cache key component that is not passed into the expire! method will result in a wildcard match on that component, allowing you to be as specific as you wish.
+*Note:
+Lawnchair will automatically condense spaces, so don't feel constrained to using underscores or dashes in keys.
+
 
                          ....:~~~~~~~~~~~~~:~~::::::,..                         
                    ......,~===~=====~~~~~::::::::::::::,.....  ..               
