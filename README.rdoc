@@ -25,31 +25,31 @@ This will connect to a default database on localhost, if you want to connect to 
 * cache_with - These are the widget parameters you want to use to build the cache key
 * expire! - Expire the instances of a widget matching the given parameters
 
-  class Bluth < Erector::Widget
-    cache_with :name, :mistake
-    cache_for 3.seasons
+    class Bluth < Erector::Widget
+      cache_with :name, :mistake
+      cache_for 3.seasons
     
-    def content
-      div "My name is #{@name} and #{@mistake.to_param}"
+      def content
+        div "My name is #{@name} and #{@mistake.to_param}"
+      end
     end
-  end
   
-  class Mistake < ORM::Base
-    attr_reader :updated_at
+    class Mistake < ORM::Base
+      attr_reader :updated_at
     
-    def initialize(size)
-      @size = size || :huge
-      @updated_at = Time.now
-    end
+      def initialize(size)
+        @size = size || :huge
+        @updated_at = Time.now
+      end
     
-    def size
-      @size
-    end
+      def size
+        @size
+      end
     
-    def to_param
-      "I_just_made_a_#{size}_mistake"
+      def to_param
+        "I_just_made_a_#{size}_mistake"
+      end
     end
-  end
   
 === cache_with
 
