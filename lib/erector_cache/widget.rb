@@ -71,7 +71,7 @@ module ErectorCache
         if self.class.key_components.blank?
           _render_via_without_caching(parent, options)
         else
-          options = {:expire_in => @expire_in || 1.hour}
+          options = {:expire_in => @expire_in || 1.hour, :raw => true}
           cached_fragment = LAWNCHAIR.cache(cache_key, options) do
             parent.capture { _render_via_without_caching(parent, options) }
           end
