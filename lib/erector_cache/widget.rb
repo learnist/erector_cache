@@ -5,6 +5,7 @@ module ErectorCache
         cattr_accessor :expire_in
         extend ClassMethods
         class_inheritable_array :key_components
+        class_inheritable_hash :interpolations
         include InstanceMethods
         alias_method_chain :_render_via, :caching
       end
@@ -13,6 +14,10 @@ module ErectorCache
     module ClassMethods
       def cache_with(*components)
         self.key_components = components
+      end
+      
+      def interpolate(interpolations)
+        self.interpolations = interpolations
       end
       
       def cache_for(ttl)
@@ -54,7 +59,6 @@ module ErectorCache
           collection << [key, value]
         end.flatten.join(":")
       end
-      
     end
 
     module InstanceMethods
@@ -72,6 +76,13 @@ module ErectorCache
           _render_via_without_caching(parent, options)
         else
           options = {:expire_in => @expire_in || 1.hour, :raw => true}
+          unless self.class.interpolations.blank?
+            options[:interpolate] = self.class.interpolations.inject({}) do |collection, interpolation| 
+              collection[interpolation.first] = self.instance_variable_get("@#{interpolation.last}")
+              collection
+            end
+          end
+          
           cached_fragment = LAWNCHAIR.cache(cache_key, options) do
             parent.capture { _render_via_without_caching(parent, options) }
           end

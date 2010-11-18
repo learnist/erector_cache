@@ -47,6 +47,26 @@ class NinjaTurtle < Turtle
   end
 end
 
+class InterpolatedTurtle < Turtle
+  def content
+    div "Cool stuff below"
+    widget InterpolatedNinjaTurtle, :name => @name, :weapon => @weapon, :master => @master, :pizzas_eaten => @pizzas_eaten
+  end
+end
+
+class InterpolatedNinjaTurtle < NinjaTurtle
+  cache_with :weapon, :master => lambda {|m| m.name }
+  cache_for 25.years
+  interpolate "PIZZAS_EATEN" => :pizzas_eaten
+  
+  def content
+    span "Weapon: #{@weapon}"
+    span "Cached at: #{Time.now.to_s(:db)}"
+    span "Eaten: PIZZAS_EATEN pizzas"
+  end
+end
+
+
 describe ErectorCache::Widget do
   before do
     @splinter = Master.new("Splinter")
@@ -167,6 +187,35 @@ describe ErectorCache::Widget do
           end
           
           @output.should include("Cached at: #{expected_cached_at_time}")
+        end
+        
+        context "when there are content interpolations set" do
+          before do
+            
+          end
+          
+          it "displays the appropriate content" do
+            expected_cached_at_time = Time.now.to_s(:db)
+
+            render_template do |controller|
+              controller.render_widget InterpolatedTurtle, :name => "Leonardo", :weapon => "Dual Katanas", :master => @splinter, :pizzas_eaten => "under 3000"
+            end
+
+            @output.should include("Weapon: Dual Katanas")
+            @output.should include("under 3000")
+            @output.should include("Cached at: #{expected_cached_at_time}")
+            
+
+            sleep 1
+
+            render_template do |controller|
+              controller.render_widget InterpolatedTurtle, :name => "Leonardo", :weapon => "Dual Katanas", :master => @splinter, :pizzas_eaten => "over 9000"
+            end
+            
+            @output.should include("Cached at: #{expected_cached_at_time}")
+            @output.should_not include("under 3000")
+            @output.should include("over 9000")
+          end
         end
       end
       
