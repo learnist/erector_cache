@@ -26,25 +26,18 @@ module ErectorCache
       
       def expire!(hash={})
         hash = Hash.new("*").merge(hash)
-        search_key = self.key_components.inject(["Lawnchair", self.to_s]) do |collection, part|
-          p_prime = (part.is_a?(Hash) ? part.keys.first : part)
-          collection << p_prime
-          collection << if part.is_a?(Hash) && hash.keys.include?(p_prime)
-            part[p_prime].call(hash[p_prime])
-          else
-            hash[p_prime].to_param
-          end
-        end.join(":")
-        
+        search_key = "Lawnchair:"+cache_key(hash, true)
         LAWNCHAIR.redis.keys(search_key).each{|key| LAWNCHAIR.redis.del(key) }
       end
       
-      def cache_key(hash)
+      def cache_key(hash, wildcard=false)
         self.key_components.inject([self.to_s]) do |collection, part|
-          object = part.is_a?(Hash) ? hash[part.keys.first] : hash[part]
+          key = (part.is_a?(Hash) ? part.keys.first : part)
+          object = hash[key]
 
-          if part.is_a?(Hash)
-            key = part.keys.first
+          if wildcard && object == "*"
+            value = "*"
+          elsif part.is_a?(Hash)
             value = Array(part[key]).map do |p| 
               if p.is_a?(Proc)
                 p.call(object)
@@ -53,7 +46,6 @@ module ErectorCache
               end
             end.join("-")
           else
-            key = part
             value = object.to_param
           end
           collection << [key, value]

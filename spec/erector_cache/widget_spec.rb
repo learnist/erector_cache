@@ -38,7 +38,7 @@ class Weapon
 end
 
 class NinjaTurtle < Turtle
-  cache_with :weapon, :master => lambda {|m| m.name }
+  cache_with :weapon, :master => [:to_param, lambda {|m| m.name }]
   cache_for 25.years
   
   def content
@@ -164,7 +164,7 @@ describe ErectorCache::Widget do
       
       it "builds a complex cache key" do
         widget = NinjaTurtle.new(:name => "Leonardo", :master => @splinter, :weapon => "Dual Katanas")
-        widget.cache_key.should == "NinjaTurtle:name:Leonardo:weapon:Dual Katanas:master:Splinter"
+        widget.cache_key.should == "NinjaTurtle:name:Leonardo:weapon:Dual Katanas:master:Splinter-Splinter"
       end
     end
     
