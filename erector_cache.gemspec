@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "erector_cache.gemspec",
     "lib/erector_cache.rb",
     "lib/erector_cache/fragment.rb",
     "lib/erector_cache/widget.rb",
