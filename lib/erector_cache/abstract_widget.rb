@@ -1,19 +1,21 @@
 module ErectorCache
-  module Widget
+  module AbstractWidget
     def self.included(base)
       base.module_eval do
         cattr_accessor :expire_in
         extend ClassMethods
-        class_inheritable_array :key_components
-        class_inheritable_hash :interpolations
+        class_attribute :key_components
+        class_attribute :interpolations
         include InstanceMethods
-        alias_method_chain :_render_via, :caching
+        alias_method_chain :_emit_via, :caching
       end
     end
 
     module ClassMethods
       def cache_with(*components)
         self.key_components = components
+        puts "Set key components: #{self.key_components.inspect}"
+        puts "Self: #{self.inspect}"
       end
       
       def interpolate(interpolations)
@@ -63,10 +65,14 @@ module ErectorCache
         return self.class.cache_key(key_data)
       end
       
-      def _render_via_with_caching(parent, options={})
+      def _emit_via_with_caching(parent, options={})
+        puts "emit with key components: #{self.class.key_components.inspect}"
+        puts "Self.class: #{self.class.inspect}"
         if self.class.key_components.blank?
-          _render_via_without_caching(parent, options)
+          puts "Erector#emit without caching"
+          _emit_via_without_caching(parent, options)
         else
+          puts "Erector#emit with caching"
           options = {:expire_in => @expire_in || 1.hour, :raw => true}
           unless self.class.interpolations.blank?
             options[:interpolate] = self.class.interpolations.inject({}) do |collection, interpolation| 
@@ -76,13 +82,14 @@ module ErectorCache
           end
           
           cached_fragment = LAWNCHAIR.cache(cache_key, options) do
-            parent.capture { _render_via_without_caching(parent, options) }
+            parent.capture { _emit_via_without_caching(parent, options) }
           end
-          parent.output << cached_fragment
+          parent.output << cached_fragment.html_safe  
         end
       end
     end
+
   end
 end
 
-Erector::Widget.send(:include, ErectorCache::Widget)
+Erector::AbstractWidget.send(:include, ErectorCache::AbstractWidget)
