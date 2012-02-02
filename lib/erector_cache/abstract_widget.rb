@@ -14,8 +14,6 @@ module ErectorCache
     module ClassMethods
       def cache_with(*components)
         self.key_components = components
-        puts "Set key components: #{self.key_components.inspect}"
-        puts "Self: #{self.inspect}"
       end
       
       def interpolate(interpolations)
@@ -66,13 +64,9 @@ module ErectorCache
       end
       
       def _emit_via_with_caching(parent, options={})
-        puts "emit with key components: #{self.class.key_components.inspect}"
-        puts "Self.class: #{self.class.inspect}"
         if self.class.key_components.blank?
-          puts "Erector#emit without caching"
           _emit_via_without_caching(parent, options)
         else
-          puts "Erector#emit with caching"
           options = {:expire_in => @expire_in || 1.hour, :raw => true}
           unless self.class.interpolations.blank?
             options[:interpolate] = self.class.interpolations.inject({}) do |collection, interpolation| 
